@@ -25,6 +25,8 @@ yarn-error.log*
 .env.development.local
 .env.test.local
 .env.production.local
+# Manter o .env.example para referência
+!.env.example
 
 # Expo
 .expo/
@@ -38,8 +40,8 @@ yarn-error.log*
 # Metro
 .metro-health-check*
 
-# Prisma
-api-blog-school-develop/generated/prisma/*.node
+# Prisma - arquivos gerados
+api-blog-school-develop/generated/
 
 # IDE
 .idea/
