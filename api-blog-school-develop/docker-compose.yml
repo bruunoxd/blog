@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  app:
+    build: .api-blog-school
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=file:./dev.db
+    volumes:
+      - .:/api-blog-school
+    command: npm run start:dev

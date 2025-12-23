@@ -1,0 +1,23 @@
+# Ignora dependências locais
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Ignora arquivos de configuração locais
+
+
+# Ignora arquivos do sistema
+.DS_Store
+Thumbs.db
+
+# Ignora arquivos de controle de versão
+.git
+.gitignore
+
+# Ignora arquivos de build
+dist
+build
+
+# Ignora arquivos do Docker
+Dockerfile
+.dockerignore
