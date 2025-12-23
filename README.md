@@ -161,7 +161,11 @@ npm run test:cov
 
 ## 👥 Autores
 
-- Bruno
+- Bruno Garcia
+- Misael
+- Jorge
+- Armando
+- Gabriel
 
 ---
 
