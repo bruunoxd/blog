@@ -1,6 +1,6 @@
 # 📚 Blog School App
 
-Aplicativo completo de blog escolar com **Backend NestJS** e **Frontend React Native/Expo**.
+Aplicativo completo da Fase 4 Tech Challenge FIAP com **Backend NestJS** e **Frontend React Native/Expo**.
 
 ## 📁 Estrutura do Projeto
 
