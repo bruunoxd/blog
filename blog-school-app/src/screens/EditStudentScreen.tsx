@@ -1,0 +1,335 @@
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import { getPerson, updatePerson } from '../services/api';
+
+export default function EditStudentScreen({ navigation, route }: any) {
+  const { user, student } = route.params || {};
+  
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(true);
+
+  useEffect(() => {
+    if (student) {
+      setName(student.name || '');
+      setEmail(student.email || '');
+      setLoadingData(false);
+    } else {
+      loadStudentData();
+    }
+  }, [student]);
+
+  const loadStudentData = async () => {
+    if (!route.params?.studentId) {
+      Alert.alert('Erro', 'ID do aluno não informado');
+      navigation.goBack();
+      return;
+    }
+
+    try {
+      const response = await getPerson(route.params.studentId);
+      const data = response.data;
+      setName(data.name || '');
+      setEmail(data.email || '');
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os dados do aluno');
+      navigation.goBack();
+    } finally {
+      setLoadingData(false);
+    }
+  };
+
+  const handleUpdateStudent = async () => {
+    // Validações
+    if (!name || !email) {
+      Alert.alert('Erro', 'Nome e email são obrigatórios');
+      return;
+    }
+
+    // Se informou senha, validar confirmação
+    if (password && password !== confirmPassword) {
+      Alert.alert('Erro', 'As senhas não coincidem');
+      return;
+    }
+
+    if (password && password.length < 4) {
+      Alert.alert('Erro', 'A senha deve ter pelo menos 4 caracteres');
+      return;
+    }
+
+    // Validar formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Erro', 'Digite um email válido');
+      return;
+    }
+
+    const studentId = student?.id || route.params?.studentId;
+    if (!studentId) {
+      Alert.alert('Erro', 'ID do aluno não encontrado');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const updateData: any = {
+        name,
+        email,
+        isTeacher: false,
+        isStudent: true,
+      };
+
+      // Só atualiza senha se foi informada
+      if (password) {
+        updateData.password = password;
+      }
+
+      await updatePerson(studentId, updateData);
+
+      Alert.alert(
+        'Sucesso',
+        'Aluno atualizado com sucesso!',
+        [
+          {
+            text: 'OK',
+            onPress: () => navigation.goBack(),
+          },
+        ]
+      );
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Erro ao atualizar aluno';
+      Alert.alert('Erro', errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loadingData) {
+    return (
+      <View style={styles.centered}>
+        <ActivityIndicator size="large" color="#8B5CF6" />
+        <Text style={styles.loadingText}>Carregando dados...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.header}>
+          <Text style={styles.title}>Editar Aluno</Text>
+          <Text style={styles.subtitle}>
+            Atualize os dados do estudante
+          </Text>
+        </View>
+
+        <View style={styles.form}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Nome Completo</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o nome do aluno"
+              placeholderTextColor="#64748B"
+              value={name}
+              onChangeText={setName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Digite o email"
+              placeholderTextColor="#64748B"
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+          </View>
+
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Alterar Senha (opcional)</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Nova Senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Deixe em branco para manter a atual"
+              placeholderTextColor="#64748B"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Confirmar Nova Senha</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Confirme a nova senha"
+              placeholderTextColor="#64748B"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry
+            />
+          </View>
+        </View>
+
+        {loading ? (
+          <ActivityIndicator size="large" color="#8B5CF6" style={styles.loader} />
+        ) : (
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleUpdateStudent}
+            >
+              <Text style={styles.submitButtonText}>Salvar Alterações</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0F172A',
+  },
+  centered: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#0F172A',
+  },
+  loadingText: {
+    color: '#94A3B8',
+    marginTop: 16,
+    fontSize: 16,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    padding: 24,
+  },
+  header: {
+    marginBottom: 32,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#F8FAFC',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#94A3B8',
+    lineHeight: 22,
+  },
+  form: {
+    gap: 20,
+  },
+  inputGroup: {
+    gap: 8,
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#CBD5E1',
+    marginLeft: 4,
+  },
+  input: {
+    backgroundColor: '#1E293B',
+    padding: 18,
+    borderRadius: 16,
+    fontSize: 16,
+    color: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '#334155',
+  },
+  divider: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 12,
+  },
+  dividerLine: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#334155',
+  },
+  dividerText: {
+    color: '#64748B',
+    fontSize: 13,
+    marginHorizontal: 12,
+    fontWeight: '500',
+  },
+  buttonContainer: {
+    marginTop: 32,
+    gap: 16,
+  },
+  submitButton: {
+    backgroundColor: '#8B5CF6',
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  submitButtonText: {
+    color: 'white',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+  cancelButton: {
+    backgroundColor: 'transparent',
+    padding: 18,
+    borderRadius: 16,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#334155',
+  },
+  cancelButtonText: {
+    color: '#94A3B8',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  loader: {
+    marginTop: 32,
+  },
+});

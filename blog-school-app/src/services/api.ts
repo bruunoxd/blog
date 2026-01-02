@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://192.168.0.11:3000';
+const API_URL = 'http://192.168.0.10:3000';
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -32,5 +32,25 @@ export const createPerson = (data: {
   isTeacher: boolean; 
   isStudent: boolean 
 }) => api.post('/person', data);
+export const getPersons = () => api.get('/person');
+export const getPerson = (id: number) => api.get(`/person/${id}`);
+export const getTeachers = () => api.get('/person').then(res => ({
+  ...res,
+  data: res.data.filter((p: any) => p.isTeacher)
+}));
+export const getStudents = () => api.get('/person').then(res => ({
+  ...res,
+  data: res.data.filter((p: any) => p.isStudent)
+}));
+export const updatePerson = (id: number, data: {
+  email?: string;
+  name?: string;
+  password?: string;
+  isTeacher?: boolean;
+  isStudent?: boolean;
+}) => api.patch(`/person/${id}`, data);
+export const deletePerson = (id: number) => api.delete(`/person/${id}`);
+
+// Comments
 export const updateComment = (id: number, data: any) => api.patch(`/comment/${id}`, data);
 export const deleteComment = (id: number) => api.delete(`/comment/${id}`);

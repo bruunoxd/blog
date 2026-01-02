@@ -119,16 +119,45 @@ export default function HomeScreen({ navigation, route }: any) {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <View>
-          <Text style={styles.headerTitle}>Posts</Text>
-          {isTeacher && <Text style={styles.roleTag}>👨‍🏫 Professor</Text>}
+        <View style={styles.headerTop}>
+          <View>
+            <Text style={styles.headerTitle}>Posts</Text>
+            {isTeacher && <Text style={styles.roleTag}>👨‍🏫 Professor</Text>}
+            {!isTeacher && <Text style={styles.studentTag}>🎓 Aluno</Text>}
+          </View>
+          {isTeacher && (
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => navigation.navigate('CreatePost', { user })}
+            >
+              <Text style={styles.addButtonText}>+ Novo Post</Text>
+            </TouchableOpacity>
+          )}
         </View>
-        <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => navigation.navigate('CreatePost', { user })}
-        >
-          <Text style={styles.addButtonText}>+ Novo Post</Text>
-        </TouchableOpacity>
+        {isTeacher && (
+          <>
+            <View style={styles.adminButtonsRow}>
+              <TouchableOpacity
+                style={styles.adminButton}
+                onPress={() => navigation.navigate('TeacherList', { user })}
+              >
+                <Text style={styles.adminButtonText}>👥 Professores</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.studentButton}
+                onPress={() => navigation.navigate('StudentList', { user })}
+              >
+                <Text style={styles.studentButtonText}>🎓 Alunos</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity
+              style={styles.postsAdminButton}
+              onPress={() => navigation.navigate('AdminPosts', { user })}
+            >
+              <Text style={styles.postsAdminButtonText}>📝 Gerenciar Posts</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
 
       <FlatList
@@ -158,14 +187,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 20,
     paddingTop: 60,
     backgroundColor: '#1E293B',
     borderBottomWidth: 1,
     borderBottomColor: '#334155',
+  },
+  headerTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 28,
@@ -177,6 +208,74 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#60A5FA',
     marginTop: 4,
+  },
+  studentTag: {
+    fontSize: 12,
+    color: '#8B5CF6',
+    marginTop: 4,
+  },
+  adminButtonsRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginTop: 16,
+  },
+  headerButtons: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  adminButton: {
+    flex: 1,
+    backgroundColor: '#059669',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#059669',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  adminButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  studentButton: {
+    flex: 1,
+    backgroundColor: '#8B5CF6',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#8B5CF6',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  studentButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 14,
+  },
+  postsAdminButton: {
+    backgroundColor: '#F59E0B',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#F59E0B',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  postsAdminButtonText: {
+    color: 'white',
+    fontWeight: '700',
+    fontSize: 14,
   },
   addButton: {
     backgroundColor: '#3B82F6',
